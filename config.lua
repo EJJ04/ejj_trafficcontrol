@@ -24,6 +24,12 @@ Config.Strings = {
     ResetZoneTitle = "Reset Zone"
 }
 
+Config.UseJob = true
+
+Config.PoliceJob = {
+    JobName = 'police'
+}
+
 Config.NotifySettings = { 
     position = 'top' -- 'top' or 'top-right' or 'top-left' or 'bottom' or 'bottom-right' or 'bottom-left' or 'center-right' or 'center-left'
 }

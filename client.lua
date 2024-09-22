@@ -100,6 +100,31 @@ function politistoptrafik()
     lib.showContext('esx_policejob:stoptrafik1')
 end
 
+local ESX, QBCore = nil, nil
+
+if GetResourceState('es_extended') == 'started' then
+    ESX = exports['es_extended']:getSharedObject()
+elseif GetResourceState('qb-core') == 'started' then
+    QBCore = exports['qb-core']:GetCoreObject()
+end
+
 RegisterCommand(Config.TrafficControlCommand.CommandName, function()
-    politistoptrafik()
+    if Config.UseJob then
+        if ESX then
+            if ESX.PlayerData.job and ESX.PlayerData.job.name == Config.PoliceJob.JobName then
+                politistoptrafik()
+            end
+        elseif QBCore then
+            local PlayerData = QBCore.Functions.GetPlayerData()
+            if PlayerData.job and PlayerData.job.name == Config.PoliceJob.JobName then
+                politistoptrafik()
+            end
+        else
+            print("Error: Neither ESX nor QBCore is detected.")
+        end
+    else
+        politistoptrafik()
+    end
 end)
+
+exports('politistoptrafik', politistoptrafik)
