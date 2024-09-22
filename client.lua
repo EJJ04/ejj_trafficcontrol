@@ -1,3 +1,11 @@
+local ESX, QBCore = nil, nil
+
+if GetResourceState('es_extended') == 'started' then
+    ESX = exports['es_extended']:getSharedObject()
+elseif GetResourceState('qb-core') == 'started' then
+    QBCore = exports['qb-core']:GetCoreObject()
+end
+
 local speedZones = {}
 
 RegisterNetEvent('esx_policejob:createSpeedZoneClient', function(coords, radius, speed)
@@ -100,18 +108,15 @@ function politistoptrafik()
     lib.showContext('esx_policejob:stoptrafik1')
 end
 
-local ESX, QBCore = nil, nil
-
-if GetResourceState('es_extended') == 'started' then
-    ESX = exports['es_extended']:getSharedObject()
-elseif GetResourceState('qb-core') == 'started' then
-    QBCore = exports['qb-core']:GetCoreObject()
-end
+RegisterNetEvent("esx:setJob")
+AddEventHandler("esx:setJob", function(job)
+    ESX.PlayerData.job = job
+end)
 
 RegisterCommand(Config.TrafficControlCommand.CommandName, function()
     if Config.UseJob then
         if ESX then
-            if ESX.PlayerData.job and ESX.PlayerData.job.name == Config.PoliceJob.JobName then
+            if ESX.PlayerData.job and ESX.PlayerData.job.name == Config.PoliceJob.JobName and not ESX.PlayerData.dead then 
                 politistoptrafik()
             end
         elseif QBCore then
