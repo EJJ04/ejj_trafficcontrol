@@ -1,0 +1,19 @@
+{
+    "police_tag": "Politi",
+    "traffic_warning": "Trafik advarsel",
+    "caution_message": "Forsigtig: Fortsæt med omhu.",
+    "zone_removed_title": "Zone fjernet",
+    "zone_removed_description": "Den sidste hastighedszone er blevet fjernet.",
+    "error_title": "Fejl",
+    "error_description": "Der opstod en fejl under fjernelse af zonen.",
+    "no_zones_title": "Ingen zoner",
+    "no_zones_description": "Der er ingen hastighedszoner at fjerne.",
+    "traffic_control_title": "Trafik kontrol",
+    "stop_traffic_title": "Stop trafik",
+    "stop_traffic_dialog_title": "Indtast zone diameter",
+    "zone_diameter_label": "Zonediameter",
+    "slow_traffic_title": "Langsom trafik",
+    "slow_traffic_dialog_title": "Indtast zone diameter og hastighed",
+    "speed_label": "Hastighed",
+    "reset_zone_title": "Nulstil sidste zone"
+  }  
