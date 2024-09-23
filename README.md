@@ -17,14 +17,14 @@ This standalone resource provides traffic control functionality and works with *
 
 ### Command
 
-By default, you can trigger the `politistoptrafik()` function using an in-game command. The command is configurable through `Config.TrafficControlCommand.CommandName`.
+By default, you can trigger the `OpenTrafficMenu` function using an in-game command. The command is configurable through `Config.TrafficControlCommand.CommandName`.
 
 - If `Config.UseJob` is set to `true`, only players with the specified job (like police) can use the command.
 - If `Config.UseJob` is set to `false`, any player can use the command without a job check.
 
 ### Export
 
-You can also trigger the `politistoptrafik()` function from another script using the following export:
+You can also trigger the `OpenTrafficMenu` function from another script using the following export:
 
 ```lua
-exports.ejj_trafficcontrol:politistoptrafik()
+exports.ejj_trafficcontrol:OpenTrafficMenu

@@ -1,3 +1,5 @@
+lib.locale()
+
 local ESX, QBCore = nil, nil
 
 if GetResourceState('es_extended') == 'started' then
@@ -20,7 +22,7 @@ RegisterNetEvent('esx_policejob:createSpeedZoneClient', function(coords, radius,
     local formattedStreetName = GetStreetNameFromHashKey(streetName)
 
     TriggerEvent('chat:addMessage', {
-        template = '<div style="padding: 0.5vw; margin: 0.05vw; background-color: rgba({1}, {2}, {3}, {4}); border-radius: 3px;"> <b>' .. Config.Strings.PoliceTag .. ' @</b><br> ' .. Config.Strings.TrafficWarning .. ' <b>{5}</b> ' .. Config.Strings.CautionMessage .. '</div>',
+        template = '<div style="padding: 0.5vw; margin: 0.05vw; background-color: rgba({1}, {2}, {3}, {4}); border-radius: 3px;"> <b>' .. locale('police_tag') .. ' @</b><br> ' .. locale('traffic_warning') .. ' <b>{5}</b> ' .. locale('caution_message') .. '</div>',
         args = { '', Config.TrafficWarningColor.r, Config.TrafficWarningColor.g, Config.TrafficWarningColor.b, Config.TrafficWarningColor.a, formattedStreetName }
     })
 
@@ -34,40 +36,40 @@ RegisterNetEvent('esx_policejob:deleteLastSpeedZoneClient', function()
             RemoveBlip(lastZone.blip)
             table.remove(speedZones)
             lib.notify({
-                title = Config.Strings.ZoneRemovedTitle,
-                description = Config.Strings.ZoneRemovedDescription,
+                title = locale('zone_removed_title'),
+                description = locale('zone_removed_description'),
                 type = 'success',
                 position = Config.NotifySettings.position,
             })
         else
             lib.notify({
-                title = Config.Strings.ErrorTitle,
-                description = Config.Strings.ErrorDescription,
+                title = locale('error_title'),
+                description = locale('error_description'),
                 type = 'error',
                 position = Config.NotifySettings.position,
             })
         end
     else
         lib.notify({
-            title = Config.Strings.NoZonesTitle,
-            description = Config.Strings.NoZonesDescription,
+            title = locale('no_zones_title'),
+            description = locale('no_zones_description'),
             type = 'error',
             position = Config.NotifySettings.position,
         })
     end
 end)
 
-function politistoptrafik()
+function OpenTrafficMenu()
     lib.registerContext({
         id = 'esx_policejob:stoptrafik1',
-        title = Config.Strings.TrafficControlTitle,
+        title = locale('traffic_control_title'),
         options = {
             {
-                title = Config.Strings.StopTrafficTitle,
+                title = locale('stop_traffic_title'),
                 icon = 'fa-solid fa-traffic-light',
                 onSelect = function()
-                    local input = lib.inputDialog(Config.Strings.StopTrafficDialogTitle, {
-                        {type = 'number', label = Config.Strings.ZoneDiameterLabel, required = true}
+                    local input = lib.inputDialog(locale('stop_traffic_dialog_title'), {
+                        {type = 'number', label = locale('zone_diameter_label'), required = true}
                     })
 
                     if input then
@@ -79,12 +81,12 @@ function politistoptrafik()
                 end
             },
             {
-                title = Config.Strings.SlowTrafficTitle,
+                title = locale('slow_traffic_title'),
                 icon = 'fa-solid fa-traffic-light',
                 onSelect = function()
-                    local input = lib.inputDialog(Config.Strings.SlowTrafficDialogTitle, {
-                        {type = 'number', label = Config.Strings.ZoneDiameterLabel, required = true},
-                        {type = 'number', label = Config.Strings.SpeedLabel, required = true}
+                    local input = lib.inputDialog(locale('slow_traffic_dialog_title'), {
+                        {type = 'number', label = locale('zone_diameter_label'), required = true},
+                        {type = 'number', label = locale('speed_label'), required = true}
                     })
 
                     if input then
@@ -96,7 +98,7 @@ function politistoptrafik()
                 end
             },
             {
-                title = Config.Strings.ResetZoneTitle,
+                title = locale('reset_zone_title'),
                 icon = 'fa-solid fa-power-off',
                 onSelect = function()
                     TriggerServerEvent('esx_policejob:deleteLastSpeedZone')
@@ -117,19 +119,19 @@ RegisterCommand(Config.TrafficControlCommand.CommandName, function()
     if Config.UseJob then
         if ESX then
             if ESX.PlayerData.job and ESX.PlayerData.job.name == Config.PoliceJob.JobName and not ESX.PlayerData.dead then 
-                politistoptrafik()
+                OpenTrafficMenu()
             end
         elseif QBCore then
             local PlayerData = QBCore.Functions.GetPlayerData()
             if PlayerData.job and PlayerData.job.name == Config.PoliceJob.JobName then
-                politistoptrafik()
+                OpenTrafficMenu()
             end
         else
             print("Error: Neither ESX nor QBCore is detected.")
         end
     else
-        politistoptrafik()
+        OpenTrafficMenu()
     end
 end)
 
-exports('politistoptrafik', politistoptrafik)
+exports('OpenTrafficMenu', OpenTrafficMenu)
