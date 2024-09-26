@@ -17,7 +17,7 @@ This standalone resource provides traffic control functionality and works with *
 
 ### Command
 
-By default, you can trigger the `OpenTrafficMenu` function using an in-game command. The command is configurable through `Config.TrafficControlCommand.CommandName`.
+By default, you can trigger the `speedzone` function using an in-game command. The command is configurable through `Config.TrafficControlCommand.CommandName`.
 
 - If `Config.UseJob` is set to `true`, only players with the specified job (like police) can use the command.
 - If `Config.UseJob` is set to `false`, any player can use the command without a job check.
