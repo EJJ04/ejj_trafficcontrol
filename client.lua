@@ -10,13 +10,17 @@ end
 
 local speedZones = {}
 
-RegisterNetEvent('esx_policejob:createSpeedZoneClient', function(coords, radius, speed)
-    local zone = AddRoadNodeSpeedZone(coords.x, coords.y, coords.z, radius + 0.0, speed + 0.0, false)
-    local blip = AddBlipForRadius(coords.x, coords.y, coords.z, radius + 0.0)
+RegisterNetEvent('ejj_trafficcontrol:createSpeedZoneClient', function(coords, radius, speed)
+    local zone = {
+        id = AddRoadNodeSpeedZone(coords.x, coords.y, coords.z, radius + 0.0, speed + 0.0, false),  
+        coords = {x = coords.x, y = coords.y, z = coords.z}  
+    }
+    
+    local blip = AddBlipForRadius(coords.x, coords.y, coords.z, radius + 0.0)  
     SetBlipColour(blip, Config.TrafficBlip.color)
     SetBlipSprite(blip, Config.TrafficBlip.sprite)
     SetBlipAlpha(blip, 80)
-    SetBlipDisplay(blip, 6)        
+    SetBlipDisplay(blip, 6)
 
     local streetName = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
     local formattedStreetName = GetStreetNameFromHashKey(streetName)
@@ -26,42 +30,40 @@ RegisterNetEvent('esx_policejob:createSpeedZoneClient', function(coords, radius,
         args = { '', Config.TrafficWarningColor.r, Config.TrafficWarningColor.g, Config.TrafficWarningColor.b, Config.TrafficWarningColor.a, formattedStreetName }
     })
 
-    table.insert(speedZones, {zone = zone, blip = blip})
+    table.insert(speedZones, {zone = zone, blip = blip})  
 end)
 
-RegisterNetEvent('esx_policejob:deleteLastSpeedZoneClient', function()
-    if #speedZones > 0 then
-        local lastZone = speedZones[#speedZones]
-        if RemoveRoadNodeSpeedZone(lastZone.zone) then
-            RemoveBlip(lastZone.blip)
-            table.remove(speedZones)
-            lib.notify({
-                title = locale('zone_removed_title'),
-                description = locale('zone_removed_description'),
-                type = 'success',
-                position = Config.NotifySettings.position,
-            })
-        else
-            lib.notify({
-                title = locale('error_title'),
-                description = locale('error_description'),
-                type = 'error',
-                position = Config.NotifySettings.position,
-            })
+RegisterNetEvent('ejj_trafficcontrol:deleteSpeedZoneClient', function(zoneIndex)
+    if speedZones[zoneIndex] then
+        local zone = speedZones[zoneIndex]
+        if RemoveRoadNodeSpeedZone(zone.zone.id) then  
+            RemoveBlip(zone.blip)
+            table.remove(speedZones, zoneIndex)
         end
-    else
-        lib.notify({
-            title = locale('no_zones_title'),
-            description = locale('no_zones_description'),
-            type = 'error',
-            position = Config.NotifySettings.position,
-        })
     end
+end)
+
+RegisterNetEvent('ejj_trafficcontrol:deleteSpeedZoneNotify', function()
+    lib.notify({
+        title = locale('zone_removed_title'),
+        description = locale('zone_removed_description'),
+        type = 'success',
+        position = Config.NotifySettings.position,
+    })
+end)
+
+RegisterNetEvent('ejj_trafficcontrol:deleteSpeedZoneErrorNotify', function()
+    lib.notify({
+        title = locale('error_title'),
+        description = locale('error_description'),
+        type = 'error',
+        position = Config.NotifySettings.position,
+    })
 end)
 
 function OpenTrafficMenu()
     lib.registerContext({
-        id = 'esx_policejob:stoptrafik1',
+        id = 'ejj_trafficcontrol:stoptrafik1',
         title = locale('traffic_control_title'),
         options = {
             {
@@ -73,10 +75,10 @@ function OpenTrafficMenu()
                     })
 
                     if input then
-                        local radius = tonumber(input[1])
+                        local radius = tonumber(input[1]) + 0.0  
                         local playerCoords = GetEntityCoords(cache.ped)
 
-                        TriggerServerEvent('esx_policejob:createSpeedZone', playerCoords, radius, 0)
+                        TriggerServerEvent('ejj_trafficcontrol:createSpeedZone', playerCoords, radius, 0)
                     end
                 end
             },
@@ -90,10 +92,10 @@ function OpenTrafficMenu()
                     })
 
                     if input then
-                        local radius = tonumber(input[1])
-                        local speed = tonumber(input[2])
+                        local radius = tonumber(input[1]) + 0.0  
+                        local speed = tonumber(input[2]) + 0.0  
                         local playerCoords = GetEntityCoords(cache.ped)
-                        TriggerServerEvent('esx_policejob:createSpeedZone', playerCoords, radius, speed)
+                        TriggerServerEvent('ejj_trafficcontrol:createSpeedZone', playerCoords, radius, speed)
                     end
                 end
             },
@@ -101,13 +103,38 @@ function OpenTrafficMenu()
                 title = locale('reset_zone_title'),
                 icon = 'fa-solid fa-power-off',
                 onSelect = function()
-                    TriggerServerEvent('esx_policejob:deleteLastSpeedZone')
+                    local playerCoords = GetEntityCoords(cache.ped)
+                    local zoneIndex = nil
+
+                    for index, zone in ipairs(speedZones) do
+                        if IsPointInZone(playerCoords, zone) then
+                            zoneIndex = index
+                            break
+                        end
+                    end
+
+                    if zoneIndex then
+                        TriggerServerEvent('ejj_trafficcontrol:deleteSpeedZone', zoneIndex)
+                    else
+                        lib.notify({
+                            title = locale('no_zones_title'),
+                            description = locale('no_zones_description'),
+                            type = 'error',
+                            position = Config.NotifySettings.position,
+                        })
+                    end
                 end
             },
         }
     })
 
-    lib.showContext('esx_policejob:stoptrafik1')
+    lib.showContext('ejj_trafficcontrol:stoptrafik1')
+end
+
+function IsPointInZone(coords, zone)
+    local zoneCoords = zone.zone.coords  
+    local radius = zone.zone.radius or 10.0  
+    return Vdist(coords.x, coords.y, coords.z, zoneCoords.x, zoneCoords.y, zoneCoords.z) <= radius
 end
 
 RegisterNetEvent("esx:setJob")
